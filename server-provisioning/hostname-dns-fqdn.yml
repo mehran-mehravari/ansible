@@ -1,0 +1,4 @@
+- name: change hostname and modify /etc/host content
+  hosts: all
+  roles:
+    - hostname-dns-fqdn

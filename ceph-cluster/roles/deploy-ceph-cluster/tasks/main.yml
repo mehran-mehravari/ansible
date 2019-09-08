@@ -1,0 +1,87 @@
+---
+- name: create cluster folder
+  file:
+    path: /home/cephadmin/cluster
+    state: directory
+    #recurse: yes
+    #owner: cephadmin
+    #group: cephadmin
+    mode: 0755
+
+- name: define monitor nodes in cluster and generate ceph.conf file
+  shell: ceph-deploy new ceph-compute01 ceph-compute02 ceph-monitor
+  args:
+    chdir: /home/cephadmin/cluster
+- lineinfile:
+    path: /home/cephadmin/cluster/ceph.conf
+    line: 'public network = 172.16.222.0/24'
+
+- name: install ceph on all nodes
+  shell: ceph-deploy install "{{ item }}"
+  #shell: ceph-deploy install "ceph-controller"
+  with_items:
+    - "ceph-controller"
+    - "ceph-compute01"
+    - "ceph-compute02"
+    - "ceph-monitor"
+  args:
+    chdir: /home/cephadmin/cluster
+
+- name: deploy the initial monitors and gather the keys
+  shell: ceph-deploy mon create-initial
+  args:
+    chdir: /home/cephadmin/cluster
+
+- name: copy the configuration file from ceph-admin node to all ceph nodes
+  shell: ceph-deploy admin "{{ item }}"
+  with_items:
+    - "ceph-controller"
+    - "ceph-compute01"
+    - "ceph-compute02"
+    - "ceph-monitor"
+  args:
+    chdir: /home/cephadmin/cluster
+
+- name: Install the Manager daemon from Ceph-admin node on Ceph Compute Nodes (OSD)
+  shell: ceph-deploy mgr create "{{ item }}"
+  with_items:
+    - "ceph-compute01"
+    - "ceph-compute02"
+  args:
+    chdir: /home/cephadmin/cluster
+
+- name: Add OSD disks to Cluster
+  shell: ceph-deploy osd create --data  /dev/sdb "{{ item }}"
+  with_items:
+    - "ceph-compute01"
+    - "ceph-compute02"
+  args:
+    chdir: /home/cephadmin/cluster
+
+
+
+
+
+
+#- name: deploy the monitor node
+#  shell: ceph-deploy --overwrite-conf mon create-initial
+#  args:
+#    chdir: /home/cephadmin/cluster
+
+#- name: copy configuration file and admin key
+#  shell: ceph-deploy --overwrite-conf admin "{{ item }}"
+#  with_items:
+#    - "ceph-compute1"
+#    - "ceph-compute2"
+#    - "ceph-monitor"
+#  args:
+#    chdir: /home/cephadmin/cluster
+
+#- name: add OSDs
+#  shell: "ceph-deploy osd create {{ item }}:/dev/sda"
+#  with_items:
+#    - "ceph-compute1"
+#    - "ceph-compute2"
+
+#  args:
+#    chdir: /home/cephadmin/cluster

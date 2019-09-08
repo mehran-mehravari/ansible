@@ -1,0 +1,12 @@
+---
+- name: Install a list of packages
+  yum:
+     name: "{{ packages }}"
+     update_cache: yes
+     state: latest
+  vars:
+    packages:
+    - htop
+    - git
+    - curl
+    - telnet

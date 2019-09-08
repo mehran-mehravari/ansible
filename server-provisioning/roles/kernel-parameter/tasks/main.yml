@@ -1,0 +1,17 @@
+---
+- name: change kernel parameters on Centos
+  copy:
+    src: centos7.conf
+    dest: /etc/sysctl.conf
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+- name: effect new values
+  shell:
+     modprobe ip_conntrack && sysctl -p
+
+- name: change kernel parameters on Ubuntu
+  copy:
+    src: ubuntu16.conf
+    dest: /etc/sysctl.conf
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+- name: effect new values
+  shell: sysctl -p

@@ -1,0 +1,19 @@
+---
+- name: Make sure we have a 'cephadmin' group
+  group:
+    name: cephadmin
+    state: present
+
+- name: create sudo user
+  user:
+    name=cephadmin
+    groups=cephadmin
+    shell=/bin/bash
+    generate_ssh_key=no
+    state=present
+
+- name: set password less access for cephadmin
+  copy:
+    src=sudoers
+    dest=/etc/sudoers.d
+    mode=0440

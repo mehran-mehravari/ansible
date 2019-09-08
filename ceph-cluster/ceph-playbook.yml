@@ -1,0 +1,37 @@
+---
+- name: common configuration
+  hosts: ceph
+  gather_facts: false
+  roles:
+    - create-sudo-user
+    - configure-hosts-file
+    - install-packages
+
+- name: setup admin node
+  become: yes
+  become_user: cephadmin
+  hosts: admin
+  gather_facts: false
+  roles:
+    - configure-admin
+
+- name: copy admin key to nodes
+  become: yes
+  become_user: cephadmin
+  hosts: mon, osd
+  roles:
+    - copy-keys
+
+- name: ceph-deploy setup
+  hosts: admin
+  roles:
+    - ceph-deploy-setup
+
+- name: deploy ceph cluster
+  become: true
+  become_method: su
+  become_user: cephadmin
+  become_flags: '-'
+  hosts: admin
+  roles:
+    - deploy-ceph-cluster

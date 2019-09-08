@@ -1,0 +1,31 @@
+---
+- name: install bash file on servers
+  script: netdata.sh --dont-wait
+  args:
+    creates: /opt/netdata/etc/netdata/netdata.conf
+
+- name: disable firewall
+  service:
+    name: firewalld
+    state: stopped
+    enabled: False
+  when: ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux'
+
+- name: make netdata as a service
+  copy:
+    src: netdata-lsb
+    dest: /etc/init.d/netdata
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: change file to executable mode
+  file:
+    path: /etc/init.d/netdata
+    mode: a+x
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+
+- name: enable netdata service
+  service:
+    name: netdata
+    enabled: yes
+    state: started
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'

@@ -1,0 +1,4 @@
+- name: install basic packages
+  hosts: all
+  roles:
+    - install-basic-packages

@@ -1,0 +1,17 @@
+---
+- name: Install chrony
+  yum:
+     name: chrony
+     update_cache: yes
+     state: latest
+
+- name: Copy a new chrony.conf file into place, backing up the original if it differs from the copied version
+  copy:
+    src: chrony.conf
+    dest: /etc/chrony.conf
+    owner: root
+    group: root
+    mode: '0644'
+    backup: yes
+  notify:
+    - restart chrony

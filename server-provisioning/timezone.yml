@@ -1,0 +1,4 @@
+- name: install chrony to sync date and time
+  hosts: all
+  roles:
+    - timezone

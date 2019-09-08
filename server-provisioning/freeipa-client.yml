@@ -1,0 +1,11 @@
+- name: Install freeipa client
+  hosts: all
+  vars:
+    freeipa_client_server: ipaserver.local
+    freeipa_client_domain: example.com
+    freeipa_client_realm: EXAMPLE.COM
+    freeipa_client_principal: admin
+    freeipa_client_password: mypassword
+    freeipa_client_dns: "{{ ansible_host }}"
+  roles:
+     - freeipa-client

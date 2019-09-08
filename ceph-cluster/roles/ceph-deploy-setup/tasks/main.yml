@@ -1,0 +1,13 @@
+---
+- name: copy ceph repo to yum repository
+  copy:
+    src: ceph.repo
+    dest: /etc/yum.repos.d
+
+- name: install "ceph-deploy" package
+  yum:
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - ceph-deploy
+    - python2-pip
